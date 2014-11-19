@@ -88,4 +88,10 @@ object List {
   def reverse[A](l: List[A]): List[A] = foldLeft(l, Nil: List[A])((l, a) => Cons(a, l))
 
   def join[A](l: List[List[A]]): List[A] = foldLeft(l, Nil: List[A])(append(_, _))
+
+  def add1(l: List[Int]): List[Int] = map(l)(_ + 1)
+
+  def doubleToString(l: List[Double]): List[String] = map(l)(_.toString)
+
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = join(map(as)(f))
 }
