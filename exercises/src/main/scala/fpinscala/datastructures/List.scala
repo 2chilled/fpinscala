@@ -70,8 +70,8 @@ object List { // `List` companion object. Contains functions for creating and wo
     helper(l)
   }
 
-  def length[A](l: List[A]): Int = foldLeft(l, 0) {
-    case (i, _) => i + 1
+  def length[A](l: List[A]): Int = foldRight(l, 0) {
+    case (_, i) => i + 1
   }
 
   def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match {
