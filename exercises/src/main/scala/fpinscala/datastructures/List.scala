@@ -93,7 +93,15 @@ object List {
 
   def doubleToString(l: List[Double]): List[String] = map(l)(_.toString)
 
-  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = join(map(as)(f))
+  def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] = join(map(as)(f))
 
-  def filter[A](as: List[A])(f: A => Boolean): List[A] = flatMap(as)(a => if(f(a)) List(a) else Nil)
+  def filter[A](as: List[A])(f: A => Boolean): List[A] = flatMap(as)(a => if (f(a)) List(a) else Nil)
+
+  def addTogether(as1: List[Int], as2: List[Int]): List[Int] = zipWith(as1, as2)(_ + _)
+
+  def zipWith[A](as1: List[A], as2: List[A])(f: (A, A) => A): List[A] = (as1, as2) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(a1, t1), Cons(a2, t2)) => Cons(f(a1, a2), zipWith(t1, t2)(f))
+  }
 }
