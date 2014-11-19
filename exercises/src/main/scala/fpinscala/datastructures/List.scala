@@ -7,11 +7,7 @@ case class Cons[+A](head: A, tail: List[A]) extends List[A] // Another data cons
 object List { // `List` companion object. Contains functions for creating and working with lists.
   def sum(ints: List[Int]): Int = foldLeft(ints, 0)(_ + _)
   
-  def product(ds: List[Double]): Double = ds match {
-    case Nil => 1.0
-    case Cons(0.0, _) => 0.0
-    case Cons(x,xs) => x * product(xs)
-  }
+  def product(ds: List[Double]): Double = foldLeft(ds, 1.0)(_ * _)
   
   def apply[A](as: A*): List[A] = // Variadic function syntax
     if (as.isEmpty) Nil
