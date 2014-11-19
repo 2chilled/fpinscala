@@ -28,10 +28,13 @@ object List {
     case _ => 101
   }
 
-  def append[A](a1: List[A], a2: List[A]): List[A] = foldRight(a1, Nil: List[A]) {
-    case (a, Nil) => Cons(a, a2)
-    case (a, l) => Cons(a, l)
-  }
+  def append[A](a1: List[A], a2: List[A]): List[A] =
+    if (a1 != Nil)
+      foldRight(a1, Nil: List[A]) {
+        case (a, Nil) => Cons(a, a2)
+        case (a, l) => Cons(a, l)
+      }
+    else a2
 
   def foldRight[A, B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
     as match {
@@ -83,4 +86,6 @@ object List {
   }
 
   def reverse[A](l: List[A]): List[A] = foldLeft(l, Nil: List[A])((l, a) => Cons(a, l))
+
+  def join[A](l: List[List[A]]): List[A] = foldLeft(l, Nil: List[A])(append(_, _))
 }
