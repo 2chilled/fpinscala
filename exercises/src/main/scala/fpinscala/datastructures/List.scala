@@ -104,4 +104,14 @@ object List {
     case (_, Nil) => Nil
     case (Cons(a1, t1), Cons(a2, t2)) => Cons(f(a1, a2), zipWith(t1, t2)(f))
   }
+
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
+    def helper[A](sup: List[A], sub2: List[A], result: Boolean): Boolean = (sup, sub2) match {
+      case (_, Nil) => result
+      case (Nil, _) => false
+      case (Cons(a, t1), Cons(b, t2)) => if(a == b) helper(t1, t2, true) else helper(t1, sub, false)
+    }
+
+    helper(sup, sub, false)
+  }
 }
