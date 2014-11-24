@@ -30,6 +30,10 @@ trait Stream[+A] {
   def startsWith[B](s: Stream[B]): Boolean = sys.error("todo")
 
   def toList: List[A] = foldRight(Nil: List[A])(_ :: _)
+
+  def headOption: Option[A] = foldRight(None: Option[A]) {
+    case (a, _) => Some(a)
+  }
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
