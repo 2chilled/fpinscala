@@ -1,6 +1,8 @@
 package fpinscala.streamingio
 
-import fpinscala.iomonad.{IO,Monad,Free,unsafePerformIO}
+import fpinscala.iomonad.IO
+
+import scala.language.{higherKinds, implicitConversions, postfixOps}
 
 object ImperativeAndLazyIO {
 
@@ -12,8 +14,6 @@ object ImperativeAndLazyIO {
   Our first implementation is an imperative implementation, embedded
   into `IO`.
                              */
-
-  import java.io._
 
   def linesGt40k(filename: String): IO[Boolean] = IO {
     // There are a number of convenience functions in scala.io.Source
@@ -92,7 +92,7 @@ object SimpleStreamTransducers {
                              */
 
   sealed trait Process[I,O] {
-    import Process._
+    import fpinscala.streamingio.SimpleStreamTransducers.Process._
 
     /*
      * A `Process[I,O]` can be used to transform a `Stream[I]` to a
@@ -421,7 +421,7 @@ object GeneralizedStreamTransducers {
                              */
 
   trait Process[F[_],O] {
-    import Process._
+    import fpinscala.streamingio.GeneralizedStreamTransducers.Process._
 
     /*
      * Many of the same operations can be defined for this generalized
@@ -690,7 +690,7 @@ object GeneralizedStreamTransducers {
      * See the definition in the body of `Process`.
      */
 
-    import java.io.{BufferedReader,FileReader}
+    import java.io.{BufferedReader, FileReader}
     val p: Process[IO, String] =
       await(IO(new BufferedReader(new FileReader("lines.txt")))) {
         case Right(b) =>
@@ -938,7 +938,7 @@ object GeneralizedStreamTransducers {
      * input, so code that uses this channel does not need to be
      * responsible for knowing how to obtain a `Connection`.
      */
-    import java.sql.{Connection, PreparedStatement, ResultSet}
+    import java.sql.{Connection, PreparedStatement}
 
     def query(conn: IO[Connection]):
         Channel[IO, Connection => PreparedStatement, Map[String,Any]] =
@@ -1011,9 +1011,9 @@ object GeneralizedStreamTransducers {
 }
 
 object ProcessTest extends App {
-  import GeneralizedStreamTransducers._
   import fpinscala.iomonad.IO
-  import Process._
+  import fpinscala.streamingio.GeneralizedStreamTransducers.Process._
+  import fpinscala.streamingio.GeneralizedStreamTransducers._
 
   val p = eval(IO { println("woot"); 1 }).repeat
   val p2 = eval(IO { println("cleanup"); 2 } ).onHalt {
