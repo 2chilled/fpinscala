@@ -2,7 +2,6 @@ package fpinscala.state
 
 import scala.annotation.tailrec
 
-
 trait RNG {
   def nextInt: (Int, RNG) // Should generate a random `Int`. We'll later define other functions in terms of `nextInt`.
 }
@@ -135,7 +134,21 @@ case class Machine(locked: Boolean, candies: Int, coins: Int)
 object State {
   type Rand[A] = State[RNG, A]
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
+    _ <- sequence(inputs.map(input => modify((machine: Machine) => (input, machine) match {
+      case (Turn, Machine(true, _, _)) => machine
+      case (Coin, Machine(false, _, _)) => machine
+      case (Coin, Machine(true, candies, coins)) => Machine(false, candies, coins + 1)
+      case (Turn, Machine(false, candies, coins)) => Machine(true, candies - 1, coins)
+    })))
+    machine <- get
+  } yield (machine.coins, machine.candies)
+
+  def get[A, S]: State[S, S] = State { s => (s, s)}
+
+  def set[S](s: S): State[S, Unit] = State { _ => ((), s)}
+
+  def modify[S](f: S => S): State[S, Unit] = State { s => ((), f(s))}
 
   def unit[A, S](a: A): State[S, A] = State(s => (a, s))
 
