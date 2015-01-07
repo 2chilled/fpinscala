@@ -45,12 +45,20 @@ object Monoid {
   }
 
   def optionMonoid[A]: Monoid[Option[A]] = new Monoid[Option[A]] {
-    override def op(a1: Option[A], a2: Option[A]): Option[A] = ???
+    override def op(a1: Option[A], a2: Option[A]): Option[A] = (a1, a2) match {
+      case (s@Some(_), _) => s
+      case (_, s@Some(_)) => s
+      case _ => None
+    }
 
-    override def zero: Option[A] = ???
+    override def zero: Option[A] = None
   }
 
-  def endoMonoid[A]: Monoid[A => A] = sys.error("todo")
+  def endoMonoid[A]: Monoid[A => A] = new Monoid[(A) => A] {
+    override def op(a1: (A) => A, a2: (A) => A): (A) => A = a => a2(a1(a))
+
+    override def zero: (A) => A = identity
+  }
 
   // TODO: Placeholder for `Prop`. Remove once you have implemented the `Prop`
   // data type from Part 2.
@@ -69,13 +77,13 @@ object Monoid {
     sys.error("todo")
 
   def foldMap[A, B](as: List[A], m: Monoid[B])(f: A => B): B =
-    sys.error("todo")
+    as.foldLeft(m.zero)((b,a) => m.op(b, f(a)))
 
   def foldRight[A, B](as: List[A])(z: B)(f: (A, B) => B): B =
-    sys.error("todo")
+    foldMap(as, endoMonoid[B])(f.curried)(z)
 
   def foldLeft[A, B](as: List[A])(z: B)(f: (B, A) => B): B =
-    sys.error("todo")
+    foldMap(as, endoMonoid[B])(a => b => f(b, a))(z)
 
   def foldMapV[A, B](as: IndexedSeq[A], m: Monoid[B])(f: A => B): B =
     sys.error("todo")
